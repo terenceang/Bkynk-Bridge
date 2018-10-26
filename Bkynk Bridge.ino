@@ -4,8 +4,16 @@ const char* command;
 
 enum status_code
 {
-	ready=0,connected,blynk_ready,error=-1
+	ready = 0, connected, blynk_ready, error = -1
 };
+
+
+int parsecommand(const char * command) {
+	if (!strcmp(command, "status")) {
+		return 1;
+	}
+	return 0;
+}
 
 status_code status = ready;
 
@@ -22,10 +30,14 @@ void loop() {
 		JsonObject& root = jsonBuffer.parseObject(Serial);
 		status = error;
 		if (root.success()) {
-			command = root["command"];
-			if (strcmp(command, "status") == 0) {
+
+			if (parsecommand(root["command"])){
 				status = ready;
 			}
+
+			//if (!strcmp(root["command"], "status")) {
+			//	status = ready;
+			//}
 		}
 		Serial.println(status);
 	}
