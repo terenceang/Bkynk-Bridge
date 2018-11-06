@@ -3,6 +3,8 @@
 #include <ESP8266WiFi.h>
 #include <BlynkSimpleEsp8266.h>
 
+#define BLYNK_PRINT Serial
+
 enum status_code
 {
 	error = -1,
@@ -34,39 +36,25 @@ void status_print(int status) {
 	}
 }
 
-
 int parsecommand(JsonObject& jsonObj) {
+
 		auto command = jsonObj["command"];
 		if (command != "") {
 			if (strcmp(command, "status") == 0) {
 				status = ready;
-				status_print(status);
-				return 1;
 			}
 			else if (strcmp(command, "connect") == 0) {
-				const char* SSID = jsonObj["SSID"];
-				const char* Password = jsonObj["Password"];
-				const char* auth_token = jsonObj["AuthToken"];
-				if (SSID && Password && auth_token) {
+				//const char* SSID = jsonObj["SSID"];
+				//const char* Password = jsonObj["Password"];
+				//const char* auth_token = jsonObj["AuthToken"];
+				const char* ssid = "";
+				const char* pass = "";
+				const char* auth = "f4057864ca204b55ae987c03a82cf7d7";
+				if (ssid && pass && auth) {
 					status = wifi_connecting;
-					WiFi.begin(SSID, Password);
 					status_print(status);
-					int timeout = 30000; //30sec
-					while (WiFi.status() != WL_CONNECTED)
-					{
-						delay(1000);
-						if(!(timeout -= 1000))break;
-						Serial.print(".");
-					}
-					Serial.println();
-					if (!timeout) {
-						status = wifi_disconnected;
-					}
-					else {
-						status = wifi_connected;
-						Serial.print("IP address: ");
-						Serial.println(WiFi.localIP());
-					}
+					Blynk.begin(auth, ssid, pass);
+					status_print(status);
 				}
 				else
 				{
@@ -78,18 +66,23 @@ int parsecommand(JsonObject& jsonObj) {
 				status = wifi_disconnected;
 			}
 				status_print(status);
+				return 1; //no commnad
 		}
-	return 0; //no command
+	return 0; //no commnad
 }
 
 void setup() {
 	// Initialize serial port
 	Serial.begin(9600);
 	while (!Serial) continue;
+	Serial.println("boot");
+	char ssid[] = "";
+	char pass[] = "";
+	char auth[] = "f4057864ca204b55ae987c03a82cf7d7";
+	Blynk.begin(auth, ssid, pass);
 }
 
 void loop() {
-
 	// reply only when you receive data:
 	if (Serial.available() > 0) {
 		JsonObject& root = jsonBuffer.parseObject(Serial);
