@@ -36,7 +36,6 @@ void status_print(int status) {
 
 
 int parsecommand(JsonObject& jsonObj) {
-
 		auto command = jsonObj["command"];
 		if (command != "") {
 			if (strcmp(command, "status") == 0) {
@@ -80,7 +79,7 @@ int parsecommand(JsonObject& jsonObj) {
 			}
 				status_print(status);
 		}
-	return 0; //no commnad
+	return 0; //no command
 }
 
 void setup() {
